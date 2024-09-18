@@ -65,7 +65,7 @@ def loss(predicted,actual):
     l = predicted-a
     return (l.dot(l))/2
 
-def update(dw1,dw2,db1,db2,learning_rate=0.02):
+def update(dw1,dw2,db1,db2,learning_rate=0.001):
     global w1, w2 , b2 , b1
     w1 = w1-learning_rate*dw1
     w2 = w2-learning_rate*dw2
@@ -111,13 +111,14 @@ imagesup = binary_to_numpy("mnist_up",True,(60000,784),int8=True)/255
 imagesdown = binary_to_numpy("mnist_down",True,(60000,784),int8=True)/255
 imagesleft = binary_to_numpy("mnist_left",True,(60000,784),int8=True)/255
 imagesright = binary_to_numpy("mnist_right",True,(60000,784),int8=True)/255
+train(images,label,0,60000)
 train(imagesup,label,0,60000)
 train(imagesdown,label,0,60000)
 train(imagesleft,label,0,60000)
 train(imagesright,label,0,60000)
 file_update()
 
-run=False
+run=True
 if __name__ == "__main__" and run:
 
     py.init()
