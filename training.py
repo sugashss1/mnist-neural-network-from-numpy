@@ -21,9 +21,12 @@ def numpy_to_binary(np_array,path):
 
     with open(path,"wb") as f:
         f.write(np_array.tobytes())
-def binary_to_numpy(path, dim_2d=False, shape=()):
+def binary_to_numpy(path, dim_2d=False, shape=(),int8=False):
     with open(path,"rb") as f:
         array = np.frombuffer(f.read(),dtype="float")
+    if int8:
+        with open(path,"rb") as f:
+            array = np.frombuffer(f.read(),dtype=np.uint8)
     if dim_2d:
         array = array.reshape(shape)
     return array
@@ -62,13 +65,18 @@ def loss(predicted,actual):
     l = predicted-a
     return (l.dot(l))/2
 
-def update(dw1,dw2,db1,db2,learning_rate=0.05):
+def update(dw1,dw2,db1,db2,learning_rate=0.02):
     global w1, w2 , b2 , b1
     w1 = w1-learning_rate*dw1
     w2 = w2-learning_rate*dw2
     b1 = b1-learning_rate*db1
     b2 = b2-learning_rate*db2
 
+def file_update():
+    numpy_to_binary(w1, "weight1")
+    numpy_to_binary(w2, "weight2")
+    numpy_to_binary(b1, "bias1")
+    numpy_to_binary(b2, "bias2")
 
 def verify():
     sum = 0
@@ -88,7 +96,6 @@ def train(images ,label,start,stop):
         a1, z1, a2, z2 = front_propagation(images[i], w1, w2, b1, b2)
         dw1, dw2, db1, db2 = back_prop(a1, a2,z1, one_to_ten(label[i]), images[i])
         update(dw1, dw2, db1, db2)
-    verify()
 
 def predict(input):
     _,_,_,a2=front_propagation(input,w1,w2,b1,b2)
@@ -100,10 +107,19 @@ b1 = binary_to_numpy("bias_one")
 b2 = binary_to_numpy("bias_two")
 images = idx3_to_numpy("train-images.idx3-ubyte")/255
 label=idx1_to_numpy("train-labels.idx1-ubyte")
-if __name__ == "__main__":
-    def draw_from_numpy(pos,value):
-        x, y = pos
-        py.draw.rect(s,(value,value,value),(x*15,y*15,x*15+15,y*15+15))
+imagesup = binary_to_numpy("mnist_up",True,(60000,784),int8=True)/255
+imagesdown = binary_to_numpy("mnist_down",True,(60000,784),int8=True)/255
+imagesleft = binary_to_numpy("mnist_left",True,(60000,784),int8=True)/255
+imagesright = binary_to_numpy("mnist_right",True,(60000,784),int8=True)/255
+train(imagesup,label,0,60000)
+train(imagesdown,label,0,60000)
+train(imagesleft,label,0,60000)
+train(imagesright,label,0,60000)
+file_update()
+
+run=False
+if __name__ == "__main__" and run:
+
     py.init()
     hight=140
     widht=140
