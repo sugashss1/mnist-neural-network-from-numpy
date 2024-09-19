@@ -7,8 +7,8 @@ def draw_from_numpy(pos,value):
     py.draw.rect(s,(value,value,value),(x*15,y*15,x*15+15,y*15+15))
 
 images = training.idx3_to_numpy("train-images.idx3-ubyte").reshape(60000,28,28)
-with open("small.png","rb") as f:
-    img = (np.frombuffer(f.read(),dtype=np.uint8).reshape(28,28))
+#with open("small.png","rb") as f:
+    #img = (np.frombuffer(f.read(),dtype=np.uint8).reshape(28,28))
 
 
 label = training.idx1_to_numpy("train-labels.idx1-ubyte")
