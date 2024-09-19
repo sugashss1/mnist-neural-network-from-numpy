@@ -1,11 +1,16 @@
+import numpy as np
 import pygame as py
 import sys
 import training
 def draw_from_numpy(pos,value):
     x, y = pos
     py.draw.rect(s,(value,value,value),(x*15,y*15,x*15+15,y*15+15))
-file_path ="train-images.idx3-ubyte"
-images = training.idx3_to_numpy(file_path).reshape(60000,28,28)
+
+images = training.idx3_to_numpy("train-images.idx3-ubyte").reshape(60000,28,28)
+with open("small.png","rb") as f:
+    img = (np.frombuffer(f.read(),dtype=np.uint8).reshape(28,28))
+
+
 label = training.idx1_to_numpy("train-labels.idx1-ubyte")
 print(label)
 print(images.shape)
@@ -26,7 +31,7 @@ while True:
             no_img-=1
     for i in range(0,28):
         for j in range(0, 28):
-            draw_from_numpy((i,j),images[no_img][j][i])
+            draw_from_numpy((i,j),img[j][i])
     s.blit(la,(0,0))
     s.blit(pa,(0,400))
     py.display.update()

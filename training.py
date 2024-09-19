@@ -65,13 +65,13 @@ def loss(predicted,actual):
     l = predicted-a
     return (l.dot(l))/2
 
-def update(dw1,dw2,db1,db2,learning_rate=0.001):
+def update(dw1,dw2,db1,db2,learning_rate=0.0035):
     global w1, w2 , b2 , b1
     w1 = w1-learning_rate*dw1
     w2 = w2-learning_rate*dw2
     b1 = b1-learning_rate*db1
     b2 = b2-learning_rate*db2
-
+    return w1, w2 , b2 , b1
 def file_update():
     numpy_to_binary(w1, "weight1")
     numpy_to_binary(w2, "weight2")
@@ -92,11 +92,18 @@ def verify():
     print(sum/1000)
 
 def train(images ,label,start,stop):
+    global w1, w2 , b2 , b1
     for i in range(start,stop):
         a1, z1, a2, z2 = front_propagation(images[i], w1, w2, b1, b2)
         dw1, dw2, db1, db2 = back_prop(a1, a2,z1, one_to_ten(label[i]), images[i])
-        update(dw1, dw2, db1, db2)
-
+        w1, w2 , b2 , b1 = update(dw1, dw2, db1, db2)
+    return w1, w2 , b2 , b1
+def reforce_train(images,label):
+    global w1, w2 , b2 , b1
+    a1, z1, a2, z2 = front_propagation(images, w1, w2, b1, b2)
+    dw1, dw2, db1, db2 = back_prop(a1, a2, z1, one_to_ten(label), images)
+    w1, w2 , b2 , b1 = update(dw1, dw2, db1, db2)
+    return w1, w2 , b2 , b1
 def predict(input):
     _,_,_,a2=front_propagation(input,w1,w2,b1,b2)
     return np.argmax(a2)
@@ -107,16 +114,7 @@ b1 = binary_to_numpy("bias_one")
 b2 = binary_to_numpy("bias_two")
 images = idx3_to_numpy("train-images.idx3-ubyte")/255
 label=idx1_to_numpy("train-labels.idx1-ubyte")
-imagesup = binary_to_numpy("mnist_up",True,(60000,784),int8=True)/255
-imagesdown = binary_to_numpy("mnist_down",True,(60000,784),int8=True)/255
-imagesleft = binary_to_numpy("mnist_left",True,(60000,784),int8=True)/255
-imagesright = binary_to_numpy("mnist_right",True,(60000,784),int8=True)/255
-train(images,label,0,60000)
-train(imagesup,label,0,60000)
-train(imagesdown,label,0,60000)
-train(imagesleft,label,0,60000)
-train(imagesright,label,0,60000)
-file_update()
+
 
 run=True
 if __name__ == "__main__" and run:
@@ -130,6 +128,7 @@ if __name__ == "__main__" and run:
     input_size = 140
     output_size = 28
     pic=np.zeros((hight,widht))
+    small=np.zeros((28,28))
     while run:
         x,y=py.mouse.get_pos()
         for e in py.event.get():
@@ -138,15 +137,15 @@ if __name__ == "__main__" and run:
             if e.type == py.KEYDOWN:
                 if e.key == py.K_SPACE:
                     s.fill((0, 0, 0))
+                    numpy_to_binary(small,"small.png")
                     pic = np.zeros((hight, widht))
         if py.mouse.get_pressed()[0]:
-            py.draw.circle(s, (250, 250, 250), (x , y ),5)
-
-
+            co=np.random.randint(200,255)
+            py.draw.circle(s, (co, co, co), (x , y ),5)
             pic=py.surfarray.array_red(s).T
             for i in range(0,20):
-                for j in range(0,15):
-                    pic[i][j]=0
+                for j in range(0,20):
+                    pic[i][j] = 0
 
 
         bin_size = input_size // output_size
@@ -154,7 +153,7 @@ if __name__ == "__main__" and run:
         a = predict(small.reshape(784)/255)
         pr = fontObj.render(str(a), True, (255, 255, 255))
 
-        py.draw.rect(s, (0, 0, 0), (0, 0, 15, 20))
+        py.draw.rect(s, (0, 0, 0), (0, 0, 20, 20))
         s.blit(pr,(0,0))
         py.display.update()
 
