@@ -112,8 +112,6 @@ w1 = binary_to_numpy("weight_one",True,(30, 784))
 w2 = binary_to_numpy("weight_two",True,(10, 30))
 b1 = binary_to_numpy("bias_one")
 b2 = binary_to_numpy("bias_two")
-images = idx3_to_numpy("train-images.idx3-ubyte")/255
-label=idx1_to_numpy("train-labels.idx1-ubyte")
 
 
 run=True
